@@ -1,0 +1,14 @@
+{% extends 'emotional_survey.html' %}
+{% block health_survey %}
+<form action=/health_survey method="post">
+
+    <div class="question" id="q1">
+      <p>Symptom reporting</p>
+      <input type="text" name="symptoms" id="a1symptoms" >
+      <label for="symptoms">What symptoms are you currently having? Please separate them with a comma</label>
+    </div>
+    <div style = "padding-top: 20px;">
+      <button>Continue</button>
+      </div>
+</form>
+{% endblock %}
