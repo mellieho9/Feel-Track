@@ -65,7 +65,7 @@ def login():
 
                 session["phone"] = rows[0]["phone"]
 
-                session["location"] = rows[0]["location"]
+                session["birthday"] = rows[0]["birthday"]
 
                 return redirect("/survey")
             else:
@@ -91,11 +91,6 @@ def register():
         conn = psycopg2.connect(DATABASE_URI)
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        # check if passwords match
-
-        if request.form.get("password") != request.form.get("confirm-password"):
-            return apology("Passwords don't match")
-
         # Ensure email doesn 't exist
 
         cur.execute("SELECT * FROM users WHERE email = '%s'" % (request.form.get("email")))
@@ -119,14 +114,14 @@ def register():
         firstname = request.form.get("firstname")
         lastname = request.form.get("lastname")
         email = request.form.get("email")
-        location = request.form.get("location")
+        birthday = request.form.get("birthday")
         phone = request.form.get("phone")
         password = request.form.get("password")
         
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        query = """INSERT INTO users (firstname, lastname, email, location, phone, password) VALUES (%s,%s,%s,%s,%s,%s)"""
-        info = (firstname, lastname, email, location, phone, password)
+        query = """INSERT INTO users (firstname, lastname, email, birthday, phone, password) VALUES (%s,%s,%s,%s,%s,%s)"""
+        info = (firstname, lastname, email, birthday, phone, password)
         
         # add user into database
 
@@ -138,14 +133,59 @@ def register():
     else:
         return render_template("signup.html")
 
-@app.route("/survey", methods=["GET", "POST"])
-def survey():
+@app.route("/emotional_survey", methods=["GET", "POST"])
+def emotional_survey():
     if request.method == "POST":
-        if request.form['1'] ==  True or request.form['2']:
-            return redirect("/")
+        if request.form['1'] != "" or request.form['2'] != "":
+            redirect("/health_survey")
+        return redirect("/travel_inquiry")
     else:
-        return render_template("survey.html")
+        return render_template("emotional_survey.html")
 
+@app.route("/health_survey", methods=["GET", "POST"])
+def health_survey():
+  if request.method == "POST":
+    # convert symptoms string to list
+    symptoms = request.form.get("symptoms")
+    symptoms_list = symptoms.split(",")
+
+    # add symptoms list into the user's database
+
+    query = """INSERT INTO users (symptoms_list) VALUES (%s)"""
+    info = (symptoms_list)
+  else:
+    return render_template("health_survey.html")
+  
+@app.route("/travel_inquiry", methods=["GET","POST"])
+def travel_inquiry():
+  if request.method == "POST":
+    if request.form['yes'] != "":
+      return redirect("/travel_plans")
+    else:
+      return redirect("/")
+  else:
+    return render_template("travel_inquiry.html")
+
+@app.route("/travel_plans", methods=["GET","POST"])
+
+def travel_plans():
+  if request.method == "POST":
+    # find user's record
+    conn = psycopg2.connect(DATABASE_URI)
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    
+    # add information into user's database
+    location = request.form.get("location")
+    start-date = request.form.get("start-date")
+    end-date = request.form.get("end-date")
+    
+    query = """INSERT INTO users (location, start-date, end-date) VALUES (%s,%s,%s)"""
+    info = (location, start-date, end-date)
+    return redirect("/")
+    
+  else:
+    return render_template("travel_plans.html")
+    
 @app.route("/logout")
 def logout():
 
