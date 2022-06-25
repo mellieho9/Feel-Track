@@ -1,0 +1,18 @@
+{% extends 'emotional_survey.html' %}
+{% block travel_plans %}
+<form action=/health_survey method="post">
+
+    <div class="question" id="q1">
+      <p>Tell us about your travel plan</p>
+      <input type="country" name="location" id="location">
+      <label for="location">Place to visit</label>
+      <input type="date" name="start-date" id="start_date">
+      <label for="start-date">Departing date</label>
+      <input type="end-date" name="end_date" id="end_date">
+      <label for="end-date">Returning date</label>
+    </div>
+    <div style = "padding-top: 20px;">
+      <button>Continue</button>
+      </div>
+</form>
+{% endblock %}
