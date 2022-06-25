@@ -1,0 +1,16 @@
+{% extends 'emotional_survey.html' %}
+{% block travel_inquiry %}
+<form action=/health_survey method="post">
+
+    <div class="question" id="q1">
+      <p>Are you traveling anytime soon?</p>
+      <input type="radio" name="yes" id="yes" value="1">
+      <label for="yes">YES</label>
+      <input type="radio" name="no" id="no" value="2">
+      <label for="no">NO</label>
+    </div>
+    <div style = "padding-top: 20px;">
+      <button>Continue</button>
+      </div>
+</form>
+{% endblock %}
