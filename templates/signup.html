@@ -1,0 +1,46 @@
+<center><h1>Let Us Get To Know You</h1></center>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<center>
+    <form id="form-signin" class="form-signin"  action=/register method="post">
+        <h3>First Name</h3>
+        <input name = "firstname" id="firstname" class="form-control" placeholder="First Name" required autofocus onkeypress="return AvoidSpace(event)">
+        <h3>Last Name</h3>
+        <input name = "lastname" id="lastname" class="form-control" placeholder="Last Name" required autofocus onkeypress="return AvoidSpace(event)">
+       
+
+        <h3>Email Address</h3>
+        <input name = "email" id="inputEmail" class="form-control" placeholder="Email" required autofocus onkeypress="return AvoidSpace(event)">
+        
+        <h3>Location</h3>
+        <input name = "location" id="location" class="form-control" placeholder="Location" required autofocus onkeypress="return AvoidSpace(event)">
+
+        <h3>Phone Number</h3>
+        <input name = "phone" id="phone" class="form-control" placeholder="Phone Number" required autofocus onkeypress="return AvoidSpace(event)">
+        
+        <h3>Password</h3>
+        <input name = "password" id="password" class="form-control" placeholder="Password" input type=password  required autofocus onkeypress="return AvoidSpace(event)">
+
+        <h3>Confirm Password</h3>
+        <input name = "confirm-password" id="confirm-password" class="form-control" placeholder="Confirm Password" input type=password required autofocus onkeypress="return AvoidSpace(event)">
+
+
+        <div style = "padding-top: 20px;">
+          <center>
+             <button><p>Register</p></button>
+          </center>
+        </div>
+    </form>
+    
+    <b style = "font-size: 20px; color: black;">Already have an account? <a href = "/login" style = "color: blue;">Log In</a></b>
+    
+    </center>
