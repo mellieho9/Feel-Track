@@ -1,0 +1,581 @@
+{
+  "description": "SMS notification",
+  "states": [
+    {
+      "name": "Trigger",
+      "type": "trigger",
+      "transitions": [
+        {
+          "event": "incomingMessage"
+        },
+        {
+          "event": "incomingCall"
+        },
+        {
+          "event": "incomingConversationMessage"
+        },
+        {
+          "next": "first_question",
+          "event": "incomingRequest"
+        },
+        {
+          "event": "incomingParent"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 0,
+          "y": -80
+        }
+      }
+    },
+    {
+      "name": "first_question",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "check_response_1",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 70,
+          "y": 120
+        },
+        "from": "{{flow.channel.address}}",
+        "body": "Hi {{flow.data.first_name}}! We just want to remind you to complete your daily feeling survey to earn points. Do you wish to complete the survey here? Press \"1\"  for yes or \"2\" for no.",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "check_response_1",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "unknown_answer_1",
+          "event": "noMatch"
+        },
+        {
+          "next": "second_question",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "if value equal_to 1",
+              "arguments": [
+                "{{widgets.first_question.inbound.Body}}"
+              ],
+              "type": "equal_to",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "next": "dashboard_answer",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 2",
+              "arguments": [
+                "{{widgets.first_question.inbound.Body}}"
+              ],
+              "type": "equal_to",
+              "value": "2"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.first_question.inbound.Body}}",
+        "offset": {
+          "x": 70,
+          "y": 340
+        }
+      }
+    },
+    {
+      "name": "unknown_answer_1",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "first_question",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -280,
+          "y": 290
+        },
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "I'm sorry, I didn't understand. Please enter \"1\" for \"yes\" or enter \"2\" for \"no\" to the SMS survey offer."
+      }
+    },
+    {
+      "name": "second_question",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "check_response_2",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 70,
+          "y": 560
+        },
+        "from": "{{flow.channel.address}}",
+        "body": "Enter one of the following emojis (😵/😓/😐/🙂/😎) that best describes your current feeling.",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "check_response_2",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "unknown_answer_2",
+          "event": "noMatch"
+        },
+        {
+          "next": "survey_request",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value matches_any_of 😐,🙂,😎",
+              "arguments": [
+                "{{widgets.second_question.inbound.Body}}"
+              ],
+              "type": "matches_any_of",
+              "value": "😵,😓,😐,🙂,😎"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.second_question.inbound.Body}}",
+        "offset": {
+          "x": 70,
+          "y": 780
+        }
+      }
+    },
+    {
+      "name": "unknown_answer_2",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "second_question",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -320,
+          "y": 650
+        },
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "I'm sorry, I didn't understand. Enter one of the following emojis (😵/😓/😐/🙂/😎) that best describes your current feeling."
+      }
+    },
+    {
+      "name": "travel_inquiry",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "check_response_travel_inquiry",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 50,
+          "y": 1040
+        },
+        "from": "{{flow.channel.address}}",
+        "body": "Are you traveling anytime soon? Enter \"1\" for yes, \"2\" for no.",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "thank_you",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 50,
+          "y": 2200
+        },
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "Thank you filling in the survey!"
+      }
+    },
+    {
+      "name": "send_results_to_server",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "next": "thank_you",
+          "event": "success"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 60,
+          "y": 1960
+        },
+        "method": "POST",
+        "parameters": [
+          {
+            "value": "{{widgets.first_question.inbound.Body}} ",
+            "key": "question1"
+          },
+          {
+            "value": "{{widgets.second_question.inbound.Body}} ",
+            "key": "question2"
+          },
+          {
+            "value": "{{widgets.travel_inquiry.inbound.Body}} ",
+            "key": "question3"
+          }
+        ],
+        "url": "http://example.com/survey",
+        "timeout": 3600
+      }
+    },
+    {
+      "name": "dashboard_answer",
+      "type": "send-message",
+      "transitions": [
+        {
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 480,
+          "y": 250
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "We see. If you are interested in filling out the survey, it should be available in your dashboard at <![CDATA[https://freyhacks2022.herokuapp.com/]. We hope you have a great day!"
+      }
+    },
+    {
+      "name": "survey_request",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "check_emoji_response",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 630,
+          "y": 560
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "Tell us more to earn points! By entering \"1\", you will be directed to a survey, which you earn points for filling out. If you don't want to participate in the survey, enter \"2\".",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "check_emoji_response",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "Copy_of_unknown_answer_1",
+          "event": "noMatch"
+        },
+        {
+          "next": "health_survey",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value matches_any_of 😐,🙂,😎",
+              "arguments": [
+                "{{widgets.second_question.inbound.Body}}"
+              ],
+              "type": "matches_any_of",
+              "value": "😵,😓"
+            }
+          ]
+        },
+        {
+          "next": "travel_inquiry",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value matches_any_of 😐,🙂,😎",
+              "arguments": [
+                "{{widgets.second_question.inbound.Body}}"
+              ],
+              "type": "matches_any_of",
+              "value": "😐,🙂,😎"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.second_question.inbound.Body}}",
+        "offset": {
+          "x": 590,
+          "y": 790
+        }
+      }
+    },
+    {
+      "name": "Copy_of_unknown_answer_1",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "survey_request",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 1000,
+          "y": 560
+        },
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "I'm sorry, I didn't understand. Please enter \"1\" for \"yes\" or enter \"2\" for \"no\" to the SMS survey offer."
+      }
+    },
+    {
+      "name": "health_survey",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "travel_plans_1",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 590,
+          "y": 1040
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "What illness do you think you may have/are you diagnosed with?",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "check_response_travel_inquiry",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "next": "Copy_of_Copy_of_unknown_answer_1",
+          "event": "noMatch"
+        },
+        {
+          "next": "travel_plans_1",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 1",
+              "arguments": [
+                "{{widgets.travel_inquiry.inbound.Body}}"
+              ],
+              "type": "equal_to",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "next": "thank_you",
+          "event": "match",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to 2",
+              "arguments": [
+                "{{widgets.travel_inquiry.inbound.Body}}"
+              ],
+              "type": "equal_to",
+              "value": "2"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.travel_inquiry.inbound.Body}}",
+        "offset": {
+          "x": 30,
+          "y": 1240
+        }
+      }
+    },
+    {
+      "name": "Copy_of_Copy_of_unknown_answer_1",
+      "type": "send-message",
+      "transitions": [
+        {
+          "next": "travel_inquiry",
+          "event": "sent"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -330,
+          "y": 1240
+        },
+        "from": "{{flow.channel.address}}",
+        "to": "{{contact.channel.address}}",
+        "body": "I'm sorry, I didn't understand. Please enter \"1\" for \"yes\" or enter \"2\" for \"no\" to the question."
+      }
+    },
+    {
+      "name": "travel_plans_1",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "travel_plans_2",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 40,
+          "y": 1470
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "Where do you plan on traveling?",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "travel_plans_2",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "travel_plans_3",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 60,
+          "y": 1690
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "Enter your departing date in mm/dd/yy form.",
+        "timeout": "3600"
+      }
+    },
+    {
+      "name": "travel_plans_3",
+      "type": "send-and-wait-for-reply",
+      "transitions": [
+        {
+          "next": "send_results_to_server",
+          "event": "incomingMessage"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "deliveryFailure"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": 410,
+          "y": 1690
+        },
+        "service": "{{trigger.message.InstanceSid}}",
+        "channel": "{{trigger.message.ChannelSid}}",
+        "from": "{{flow.channel.address}}",
+        "body": "Enter your returning date in mm/dd/yy form.",
+        "timeout": "3600"
+      }
+    }
+  ],
+  "initial_state": "Trigger",
+  "flags": {
+    "allow_concurrent_calls": true
+  }
+}
