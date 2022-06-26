@@ -8,4 +8,4 @@ Summer vacations are just around the corner, and the hottest thing to do is trav
 ## For frontend
 Figma, Framer, and DeCathlon's Vitamin UI kit
 ## For backend
-Twilio (SMS), Flask, PostgreSQL
+Twilio SMS and Studio, Flask, PostgreSQL
