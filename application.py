@@ -1,5 +1,6 @@
 #imports
 
+from functools import wraps
 import os 
 
 # flask imports 
@@ -10,6 +11,14 @@ from flask_session import Session
 # DB import
 import psycopg2
 import psycopg2.extras
+
+# ML imports
+
+import model
+import pickle
+
+# helper functions
+from helpers import login_required
 
 
 # Configure application
@@ -67,7 +76,7 @@ def login():
 
                 session["birthday"] = rows[0]["birthday"]
 
-                return redirect("/survey")
+                return redirect("/emotional_survey")
             else:
                 return apology("Incorrect credentials")
         else:
@@ -134,40 +143,80 @@ def register():
         return render_template("signup.html")
 
 @app.route("/emotional_survey", methods=["GET", "POST"])
-def emotional_survey():
+def emotional_survey(): 
     if request.method == "POST":
-        if request.form['1'] != "" or request.form['2'] != "":
-            redirect("/health_survey")
-        return redirect("/travel_inquiry")
+        print(request.form.get("lv1"), request.form.get("lv5"))
+        if request.form.get('lv1') != None or request.form.get('lv2') != None:
+            return redirect("/health_survey")
+        else:
+            return redirect("/travel_inquiry")
     else:
         return render_template("emotional_survey.html")
 
 @app.route("/health_survey", methods=["GET", "POST"])
+@login_required
 def health_survey():
   if request.method == "POST":
-    # convert symptoms string to list
+
     symptoms = request.form.get("symptoms")
-    symptoms_list = symptoms.split(",")
 
-    # add symptoms list into the user's database
+    illness = model.predictDisease(symptoms)
 
-    query = """INSERT INTO users (symptoms_list) VALUES (%s)"""
-    info = (symptoms_list)
+    if illness == None:
+        return redirect(f"/self_diagnose")
+
+    # add user's illness to database
+
+    query = """UPDATE users SET illness = ('%s') WHERE id = (%s)"""
+    info = (illness, session.get("user_id"))
+    
+    conn = psycopg2.connect(DATABASE_URI)
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    add_illness = cur.execute(query % info)
+
+    conn.commit()
+
+    return redirect(f"/survey_results/{illness}")
+
   else:
     return render_template("health_survey.html")
+
+@app.route("/survey_results/<illness>")
+def survey_results(illness):
+    return render_template("survey_results.html", illness=illness)
+
+@app.route("/self_diagnose", methods=["GET", "POST"])
+@login_required
+def self_diagnose():
+    if request.method == "POST":
+        # add user's illness to database
+
+        query = """UPDATE users SET illness = ('%s') WHERE id = (%s)"""
+        info = (request.form.get("illness"), session.get("user_id"))
+        
+        conn = psycopg2.connect(DATABASE_URI)
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        add_illness = cur.execute(query % info)
+
+        conn.commit()
+        return redirect("/")
+    else:
+        return render_template("self_diagnose.html")
   
 @app.route("/travel_inquiry", methods=["GET","POST"])
 def travel_inquiry():
   if request.method == "POST":
-    if request.form['yes'] != "":
-      return redirect("/travel_plans")
-    else:
+    if request.form.get('yes') == None:
       return redirect("/")
+    else:
+      return redirect("/travel_plans")
   else:
     return render_template("travel_inquiry.html")
 
 @app.route("/travel_plans", methods=["GET","POST"])
-
+@login_required
 def travel_plans():
   if request.method == "POST":
     # find user's record
@@ -176,11 +225,17 @@ def travel_plans():
     
     # add information into user's database
     location = request.form.get("location")
-    start-date = request.form.get("start-date")
-    end-date = request.form.get("end-date")
+    start_date = request.form.get("start_date")
+    end_date = request.form.get("end_date")
+
+    query = """UPDATE users SET (location, start_date, end_date) = (%s,%s,%s) WHERE id = (%s)"""
     
-    query = """INSERT INTO users (location, start-date, end-date) VALUES (%s,%s,%s)"""
-    info = (location, start-date, end-date)
+   # query = """INSERT INTO users (location, start_date, end_date) VALUES (%s,%s,%s)"""
+    info = (location, start_date, end_date, session.get("user_id"))
+
+    cur.execute(query , info)
+    conn.commit()
+
     return redirect("/")
     
   else:
@@ -205,3 +260,4 @@ def apology(message, code=400):
             s = s.replace(old, new)
         return s
     return render_template("apology.html", top=code, bottom=escape(message)), code
+
