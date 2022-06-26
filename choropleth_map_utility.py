@@ -4,6 +4,7 @@
 
 from enum import Enum
 
+# 
 # the kinds of data the app provides
 class Illness(Enum):
     Covid_19 = 'Covid-19'

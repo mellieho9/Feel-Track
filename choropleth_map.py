@@ -4,6 +4,7 @@ import folium
 import os
 import json
 
+# 
 #  a class that, given the option, will generate a map 
 # for a certain outbreak data set
 class mapper():
