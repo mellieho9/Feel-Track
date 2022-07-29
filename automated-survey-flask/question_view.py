@@ -17,12 +17,4 @@ def is_sms_request():
 def sms_twiml(question):
     response = MessagingResponse()
     response.message(question.content)
-    response.message(SMS_INSTRUCTIONS[question.kind])
     return str(response)
-
-
-SMS_INSTRUCTIONS = {
-    Question.TEXT: 'Please type your answer',
-    Question.BOOLEAN: 'Please type 1 for yes and 0 for no',
-    Question.NUMERIC: 'Please type a number between 1 and 10',
-}
