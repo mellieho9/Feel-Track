@@ -50,7 +50,7 @@
           "y": 120
         },
         "from": "{{flow.channel.address}}",
-        "body": "Hi {{flow.data.first_name}}! We just want to remind you to complete your daily feeling survey to earn points. Do you wish to complete the survey here? Press \"1\"  for yes or \"2\" for no.",
+        "body": "Hi {{flow.data.first_name}}! We just want to remind you to complete your daily feeling survey to earn points. Do you wish to complete the survey here? Press \"1\"  for yes or \"0\" for no.",
         "timeout": "3600"
       }
     },
@@ -81,12 +81,12 @@
           "event": "match",
           "conditions": [
             {
-              "friendly_name": "If value equal_to 2",
+              "friendly_name": "If value equal_to 0",
               "arguments": [
                 "{{widgets.first_question.inbound.Body}}"
               ],
               "type": "equal_to",
-              "value": "2"
+              "value": "0"
             }
           ]
         }
@@ -118,7 +118,7 @@
         },
         "from": "{{flow.channel.address}}",
         "to": "{{contact.channel.address}}",
-        "body": "I'm sorry, I didn't understand. Please enter \"1\" for \"yes\" or enter \"2\" for \"no\" to the SMS survey offer."
+        "body": "I'm sorry, I didn't understand. Please enter \"1\" for \"yes\" or enter \"0\" for \"no\" to the SMS survey offer."
       }
     },
     {
@@ -220,7 +220,7 @@
           "y": 1040
         },
         "from": "{{flow.channel.address}}",
-        "body": "Are you traveling anytime soon? Enter \"1\" for yes, \"2\" for no.",
+        "body": "Are you traveling anytime soon? Enter \"1\" for yes, \"0\" for no.",
         "timeout": "3600"
       }
     },
@@ -327,7 +327,7 @@
         "service": "{{trigger.message.InstanceSid}}",
         "channel": "{{trigger.message.ChannelSid}}",
         "from": "{{flow.channel.address}}",
-        "body": "Tell us more to earn points! By entering \"1\", you will be directed to a survey, which you earn points for filling out. If you don't want to participate in the survey, enter \"2\".",
+        "body": "Tell us more to earn points! By entering \"1\", you will be directed to a survey, which you earn points for filling out. If you don't want to participate in the survey, enter \"0\".",
         "timeout": "3600"
       }
     },
@@ -395,7 +395,7 @@
         },
         "from": "{{flow.channel.address}}",
         "to": "{{contact.channel.address}}",
-        "body": "I'm sorry, I didn't understand. Please enter \"1\" for \"yes\" or enter \"2\" for \"no\" to the SMS survey offer."
+        "body": "I'm sorry, I didn't understand. Please enter \"1\" for \"yes\" or enter \"0\" for \"no\" to the SMS survey offer."
       }
     },
     {
@@ -452,12 +452,12 @@
           "event": "match",
           "conditions": [
             {
-              "friendly_name": "If value equal_to 2",
+              "friendly_name": "If value equal_to 0",
               "arguments": [
                 "{{widgets.travel_inquiry.inbound.Body}}"
               ],
               "type": "equal_to",
-              "value": "2"
+              "value": "0"
             }
           ]
         }
@@ -489,7 +489,7 @@
         },
         "from": "{{flow.channel.address}}",
         "to": "{{contact.channel.address}}",
-        "body": "I'm sorry, I didn't understand. Please enter \"1\" for \"yes\" or enter \"2\" for \"no\" to the question."
+        "body": "I'm sorry, I didn't understand. Please enter \"1\" for \"yes\" or enter \"0\" for \"no\" to the question."
       }
     },
     {
